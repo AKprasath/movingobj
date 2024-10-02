@@ -4,6 +4,11 @@ import imutils
 # Initialize video capture
 cap = cv2.VideoCapture(0)
 
+# Check if the webcam is opened correctly
+if not cap.isOpened():
+    print("Error: Could not open video stream.")
+    exit()
+
 # Define variables
 first_frame = None
 area_threshold = 500  # Adjust this value for sensitivity
@@ -11,6 +16,10 @@ area_threshold = 500  # Adjust this value for sensitivity
 while True:
     # Capture frame
     ret, frame = cap.read()
+
+    if not ret:
+        print("Error: Failed to capture frame.")
+        break
 
     # Resize frame (optional)
     frame = imutils.resize(frame, width=500)
@@ -32,8 +41,9 @@ while True:
     # Threshold for significant changes
     thresh = cv2.threshold(frame_diff, 30, 255, cv2.THRESH_BINARY)[1]
 
-    # Find contours in thresholded image
-    contours, _ = cv2.findContours(thresh.copy(), cv2.RETR_EXTERNAL, cv2.CHAIN_APPROX_SIMPLE)
+    # Find contours in thresholded image (adapt for OpenCV version)
+    contours = cv2.findContours(thresh.copy(), cv2.RETR_EXTERNAL, cv2.CHAIN_APPROX_SIMPLE)
+    contours = contours[0] if len(contours) == 2 else contours[1]
 
     # Detect motion
     motion_detected = False
